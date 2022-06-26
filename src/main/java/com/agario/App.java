@@ -1,31 +1,25 @@
 package com.agario;
 import java.awt.AWTException;
 import java.awt.Button;
-import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.Rectangle;
 import java.awt.Robot;
-import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Random;
+import java.net.CacheRequest;
+import java.awt.MouseInfo;
+import com.agario.additionalClasses;
 
 import javax.imageio.ImageIO;
-import javax.swing.plaf.basic.BasicComboBoxUI.FocusHandler;
-import javax.swing.plaf.basic.BasicTreeUI.TreeCancelEditingAction;
 
-import com.agario.additionalClasses.Genome;
-import com.agario.additionalClasses.MyColor;
-import com.agario.additionalClasses.Pair;
-import com.agario.additionalClasses.SizeInt;
+import org.w3c.dom.events.MouseEvent;
 
-import com.agario.Bot;
+import java.awt.image.BufferedImage;
+import java.awt.Rectangle;
 
 
 // import org.jnativehook.GlobalScreen;
@@ -70,18 +64,7 @@ public class App
                 }
                 if (e.getKeyCode() == KeyEvent.VK_I){
                     
-                    // gen.mutation();
-                    
-                    // try {
-
-                    //     reload();
-
-                    // } catch (AWTException e1) {
-                    //     e1.printStackTrace();
-                    // } catch (InterruptedException e1) {
-                    //     e1.printStackTrace();
-                    // }
-                    
+                    Bot.RELOADIND_THE_TRY = !Bot.RELOADIND_THE_TRY; 
                     
                 }
             }
@@ -118,14 +101,22 @@ public class App
 
         Robot robot = new Robot();
                         
-        robot.mouseMove(722, 584);
+        robot.mouseMove(690, 388);
         robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
         Thread.sleep(400);
         robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+
+        Thread.sleep(1500);
         
-        Thread.sleep(500);
         
-        robot.mouseMove(602, 394);
+        robot.mouseMove(1009, 294);
+        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+        Thread.sleep(400);
+        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+
+        Thread.sleep(1000);
+        
+        robot.mouseMove(716, 318);
         robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
         Thread.sleep(400);
         robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
@@ -141,18 +132,31 @@ public class App
     {
 
 
+        // ImageIO.write(image,"png",new File("endScreen2.png"));
+        int thisSessionBotsGeneration = 0;
 
         AWTExample1 f = new AWTExample1();  
         
         long[] liveTime = new long[10];
         
-        String lastGenUrl = "2_287152_.txt";
+        String lastGenUrl = "";
         additionalClasses a = new additionalClasses();
 
+        boolean firstTime = false;
+
+
         while(true){
+
+            
+
             for (int i = 0; i < 10; i++){
-                Bot bot = new Bot(i);
-                bot.gen = a.new Genome(lastGenUrl);
+                
+                Bot bot = new Bot(i);       
+                if (lastGenUrl != "" && firstTime){bot.gen = a.new Genome(lastGenUrl);}
+
+                firstTime = false;
+
+                // bot.gen = a.new Genome();
     
                 bot.start();
                 // Thread.currentThread().join();
@@ -173,8 +177,31 @@ public class App
                 }
             }
     
-            lastGenUrl = (maxIndex + "_" + max + "_" + ".txt");
+            thisSessionBotsGeneration++;
 
+
+            lastGenUrl = (maxIndex + ".txt");
+
+            try(FileWriter fw = new FileWriter("g - " + thisSessionBotsGeneration + "_" + "LiveTime=" + max +"_"+ lastGenUrl)){
+                try (FileReader fr = new FileReader(lastGenUrl)){
+                    
+                    int c;
+                    String s = "";
+                    while( (c=fr.read()) != -1){
+                        
+                        s += (char)c;
+
+                    }
+    
+    
+                    fw.write(s);
+
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+            firstTime = true;
 
         }
         

@@ -11,10 +11,16 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
+import java.beans.IntrospectionException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
@@ -25,7 +31,7 @@ import com.agario.additionalClasses.Genome;
 import com.agario.additionalClasses.MyColor;
 import com.agario.additionalClasses.Pair;
 import com.agario.additionalClasses.SizeInt;
-;
+import com.agario.additionalClasses;
 
 public class Bot {
     
@@ -96,19 +102,19 @@ public class Bot {
 
         Robot robot = new Robot();
 
-        Rectangle rectagle = new Rectangle(580, 500, 300, 100);
+        Rectangle rectagle = new Rectangle(580, 350, 250, 50);
+        // Rectangle rectagle = new Rectangle(580, 500, 300, 100);
         BufferedImage image;
 
         // ImageIO.write(image, "png", new File("endScreen.png"));
 
         
-        BufferedImage example = ImageIO.read(new File("endScreen.png"));
+        BufferedImage example = ImageIO.read(new File("endScreen2.png"));
         additionalClasses a = new additionalClasses();
 
         while (true){
-            this.gen = a.new Genome();
+            // this.gen = a.new Genome();
             
-            Thread.sleep(500);
             for (int i = 0; i < 10; i++) {
                 way_decide();
             }
@@ -130,7 +136,7 @@ public class Bot {
                 // GameOver;
                 
                 this.howLongItLive = System.currentTimeMillis() - time;
-                this.gen.save(botName + "_" + this.howLongItLive + "_" + ".txt");
+                this.gen.save(botName + ".txt");
                 return;
                 
             }
@@ -164,6 +170,11 @@ public class Bot {
         Rectangle rectagle = new Rectangle(screenshot_x, screenshot_y, screenshot_w, screenshot_h);
         BufferedImage image = robot.createScreenCapture(rectagle);
 
+        ArrayList<Integer> blackPixels = new ArrayList<Integer>();
+        HashMap <Integer,String> blackPixMap = new HashMap<Integer,String>();
+
+
+
 
         int maxBlackPix = 0;
         String where_we_go = "";
@@ -189,7 +200,10 @@ public class Bot {
                     // System.out.println( "blue = " + color.getBlue() + " green = " + color.getGreen()
                     //  + " red = " + color.getRed() );
                 }
-            }    
+            }
+            
+            blackPixels.add(blackPix);
+            blackPixMap.put(blackPix,curSide.first);
             
             if (maxBlackPix < blackPix){
                 maxBlackPix = blackPix;
@@ -201,43 +215,112 @@ public class Bot {
             // print(curSide.first + " blacpix = " + blackPix );
 
         }
+        
+        // //Геном решает куда идти
 
-        //Геном решает куда идти
-        for (Pair<String,String> p : this.gen.geneticTable) {if (p.first == where_we_go){where_we_go = p.second;}}
+        String sides[] = {"слево-сверху","сверху","сраво-сверху","справа","снизу-справа","снизу","снизу-слева","слева"};
+        HashMap<String,Integer> sidesD = new HashMap<>();
+
+        for (int i = 0; i < sides.length; i++) {
+            sidesD.put(sides[i], i);
+        }
+
+        Collections.sort(blackPixels);
+        
+
+        // Integer[] blackPArr = {0,0,0,0,0,0,0,0};             
+
+        // print(blackPixels);
+        // Iterator<Integer> it =  blackPixels.keySet().iterator();
+        // int ieiowqoiepqw = 0;
+        // while (it.hasNext()) {
+        //     int afasf = it.next();
+        //     blackPArr[ieiowqoiepqw++] = afasf;
+        //     print(afasf);
+        // }
+
+        // Arrays.sort(blackPArr);
+        
+        String curSituation = "";
+        curSituation += sidesD.get(blackPixMap.get(blackPixels.get(0)));
+        curSituation += sidesD.get(blackPixMap.get(blackPixels.get(3)));
+        curSituation += sidesD.get(blackPixMap.get(blackPixels.get(4)));
+        curSituation += sidesD.get(blackPixMap.get(blackPixels.get(7)));
+
+        print(curSituation);
+        // print(this.gen.geneticTable2);
+        int choice = this.gen.makeAChoice(curSituation);
 
         
-        
+        if (choice == '8'){
+            robot.keyPress(KeyEvent.VK_SPACE);
+            Thread.sleep(300);
+            robot.keyRelease(KeyEvent.VK_SPACE);
+        }
+
+        for (int i = 0; i < sides.length; i++) {
+            if (i == choice){where_we_go = sides[i];}
+        }
+
+
         print("we go -> " + where_we_go);
 
         
-
         switch (where_we_go){
             case "слево-сверху":
-                robot.mouseMove(200, 200);
+                additionalClasses.mouseMoveSlow(200, 200);
                 break;
             case "сверху":
-                robot.mouseMove(740, 100);
+                additionalClasses.mouseMoveSlow(740, 100);
                 break;
             case "сраво-сверху":
-                robot.mouseMove(1200, 200);
+                additionalClasses.mouseMoveSlow(1200, 200);
                 break;
             case "справа":
-                robot.mouseMove(1200,400);
+                additionalClasses.mouseMoveSlow(1200,400);
                 break;
             case "снизу-справа":
-                robot.mouseMove(1200,800);
+                additionalClasses.mouseMoveSlow(1200,800);
                 break;
             case "снизу":
-                robot.mouseMove(740, 800);
+                additionalClasses.mouseMoveSlow(740, 800);
                 break;
             case "снизу-слева":
-                robot.mouseMove(200, 800);
+                additionalClasses.mouseMoveSlow(200, 800);
                 break;
             case "слева":
-                robot.mouseMove(200,400);
+                additionalClasses.mouseMoveSlow(200,400);
                 break;
         
         }
+
+        // switch (where_we_go){
+        //     case "слево-сверху":
+        //         robot.mouseMove(200, 200);
+        //         break;
+        //     case "сверху":
+        //         robot.mouseMove(740, 100);
+        //         break;
+        //     case "сраво-сверху":
+        //         robot.mouseMove(1200, 200);
+        //         break;
+        //     case "справа":
+        //         robot.mouseMove(1200,400);
+        //         break;
+        //     case "снизу-справа":
+        //         robot.mouseMove(1200,800);
+        //         break;
+        //     case "снизу":
+        //         robot.mouseMove(740, 800);
+        //         break;
+        //     case "снизу-слева":
+        //         robot.mouseMove(200, 800);
+        //         break;
+        //     case "слева":
+        //         robot.mouseMove(200,400);
+        //         break;
+        
+        // }
 
         
         // if ()
